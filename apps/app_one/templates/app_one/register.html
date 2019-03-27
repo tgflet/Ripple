@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Register</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <h3>Register here!</h3>
+        <form action="/join" method="POST">
+        {% csrf_token %}
+        <h6>First Name:</h6>
+        {% if messages %}
+            {% for message in messages %}
+                {% if "fname" in message.tags %}
+                <h6 class="text-danger">{{message}}</h6>
+                {% endif %}
+            {% endfor %}
+        {% endif %}   
+        <p><input type="text" name="fname"></p>
+        <h6>Last Name:</h6>
+        {% if messages %}
+            {% for message in messages %}
+                {% if "lname" in message.tags %}
+                <h6 class="text-danger">{{message}}</h6>
+                {% endif %}
+            {% endfor %}
+        {% endif %}   
+        <p><input type="text" name="lname"></p>
+        <h6>Username:</h6>
+        {% if messages %}
+            {% for message in messages %}
+                {% if "username" in message.tags %}
+                <h6 class="text-danger">{{message}}</h6>
+                {% endif %}
+            {% endfor %}
+        {% endif %}   
+        <p><input type="text" name="username"></p>
+        <h6>Email:</h6>
+        {% if messages %}
+            {% for message in messages %}
+                {% if "email" in message.tags %}
+                <h6 class="text-danger">{{message}}</h6>
+                {% endif %}
+            {% endfor %}
+        {% endif %}   
+        <p><input type="text" name="email"></p>
+        <h6>Birth Date:</h6>
+        {% if messages %}
+            {% for message in messages %}
+                {% if "bday" in message.tags %}
+                <h6 class="text-danger">{{message}}</h6>
+                {% endif %}
+            {% endfor %}
+        {% endif %}   
+        <p><input type="date" name="bday"></p>
+        <h6>Password:</h6>
+        {% if messages %}
+            {% for message in messages %}
+                {% if "pass" in message.tags %}
+                <h6 class="text-danger">{{message}}</h6>
+                {% endif %}
+            {% endfor %}
+        {% endif %}   
+        <p><input type="password" name="pass"></p>
+        <h6>Confirm password:</h6>
+        {% if messages %}
+            {% for message in messages %}
+                {% if "pass2" in message.tags %}
+                <h6 class="text-danger">{{message}}</h6>
+                {% endif %}
+            {% endfor %}
+        {% endif %}   
+        <p><input type="password" name="pass2"></p>
+        <p><input type="submit" class="btn-success" value="Register!"></p>
+        </form>
+    </div>
+    <a href="/">Go Back</a>
+</body>
+</html>

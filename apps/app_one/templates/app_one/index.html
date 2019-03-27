@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Welcome to Social Media</title>
+</head>
+<body>
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                {% if "out" in message.tags %}
+                    <h6 class="text-danger">{{message}}</h6>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        <div class="row">
+            <div class="col-sm-8">
+                Most recent Posts:
+                {% for post in posts|slice:":3"%}
+                <div>
+                    <p><a href="/users/{{post.poster.id}}">{{post.poster.username}}</a>:</p>
+                    <p>{{post.post}}</p>
+                    <p>Category: <span class="text-italic"><a href="/{{post.categories.values.0.name}}/results">{{post.categories.values.0.name}}</a></span> | Tag(s): {% for tag in post.tags.values %}<a href="/all/results/{{tag.name}}">{{tag.name}}</a> {% endfor %}
+                    </p>
+                    {% if request.session.user == post.poster.id %}
+                    <form action="/delete" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="post" value="{{post.id}}">
+                        <input type="submit" class="btn-danger" value="Delete">                    
+                    </form>
+                    {% endif %}
+                    <hr>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col-sm-3">
+                    <h3>Login here!</h3>
+                    {% if messages %}
+                        {% for message in messages %}
+                        {% if "login" in message.tags %}
+                            <h6 class="text-danger">{{message}}</h6>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    <form action="/login" method="post">
+                    {% csrf_token %}
+                    <h6>Email:</h6>
+                    <p><input type="text" name="id"></p>
+                    <h6>Password:</h6>
+                    <p><input type="password" name="pass"></p>
+                    <p><input type="submit" class="btn-success" value="Log In!"></p>
+                    </form>
+                <button class="btn-primary">
+                        <a href="/register"><span class='text-light'>Register</span></a>
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

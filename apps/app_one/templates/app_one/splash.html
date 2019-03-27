@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Splashdown</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <h5>Welcome <a href="users/{{profile.id}}">{{profile.username}}</a></h5>
+            <a href="/logout">Log out</a>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <h6>Say something new</h6>
+                <hr>
+                {% if profile.id == request.session.user %}
+                    <h6>Make a new post</h6>
+                    <form action="/post" method="post">
+                    {% csrf_token %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if "text" in message.tags %}
+                            <h6 class="text-danger">{{message}}</h6>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}   
+                    <textarea name="text" cols="30" rows="6"></textarea>
+                    <p>Category:
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if "cat" in message.tags %}
+                            <h6 class="text-danger">{{message}}</h6>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}   
+                    {% for category in categories %}
+                    <input type="radio" name="cat" value="{{category.id}}"> {{category.name}} | 
+                    {% endfor %}
+                    </p>
+                    <p>Tags: (optional)</p>
+                    <input type="text" name="tag1" placeholder="Tag 1">
+                    <input type="text" name="tag2" placeholder="Tag 2">
+                    <input type="text" name="tag3" placeholder="Tag 3">
+                    <input type="submit" class="btn-primary" value="Post">
+                    </form>
+                    <hr>
+                {% endif %}
+                <form action="/search" method="post">
+                {% csrf_token %}
+                <p><input type="text" name="query" placeholder="Search tags">
+                <input type="submit" value="Search"></p>
+                {% for category in categories|slice:':2:' %}
+                    <input type="radio" name="cat" value="{{category.id}}"> {{category.name}} | 
+                {% endfor %}
+                </form>
+            </div>
+            <div class="col-sm-7">
+                <h6>Followed Content:</h6>
+                <hr>
+                {% for post in feed %}
+                <div class="container border border-dark">
+                    <p><a href="/users/{{post.poster.id}}">{{post.poster.username}}</a> says: {{post.post}}</p>
+                    <p>Category: <span class="text-italic"><a href="/{{post.categories.values.0.name}}/results">{{post.categories.values.0.name}}</a></span> | Tag(s): {% for tag in post.tags.values %}<a href="/all/results/{{tag.name}}">{{tag.name}}</a> {% endfor %}
+                    </p>
+                    {% if request.session.user == post.poster.id %}
+                    <form action="/delete" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="post" value="{{post.id}}">
+                        <input type="submit" class="btn-danger" value="Delete">                    
+                    </form>
+                    {% endif %}
+                    {% if 'user' in request.session %}
+                    <form action="/comment" method="post">
+                        {% csrf_token %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                {% if "text" in message.tags %}
+                                <h6 class="text-danger">{{message}}</h6>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}   
+                        <textarea name="text" cols="50" rows="2"></textarea>
+                        <input type="hidden" name="source" value={{post.id}}>
+                        <p><input type="submit" class="btn-secondary" value="Comment"></p>
+                    </form>
+                    {% else %}
+                    <a href="/register">Register to join the conversation</a>
+                    {% endif %}
+                    {% for comment in post.comments.all %}
+                    <ul>
+                        <li><a href="/users/{{comment.commenters.id}}">{{comment.commenters.username}}</a> says: {{comment.comment}}
+                        </li>
+                        <li>{% if request.session.user == comment.commenters.id %}
+                                <form action="/delete" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="comment" value="{{comment.id}}">
+                                    <input type="submit" class="btn-danger" value="Delete">                    
+                                </form>
+                                {% endif %}</li>
+                    </ul>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

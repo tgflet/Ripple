@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <a href="/splash">Back to Splash</a>
+    <div class="container">
+    {% if existing is False %}
+    <p>Sorry, no posts with your tag: {{tag}}, exists at this time.</p>
+    <p>Try starting the conversation yourself!</p>
+    <p>Feel free to search again.</p>
+    <form action="/search" method="post">
+    {% csrf_token %}
+    <p><input type="text" name="query" placeholder="Search tags">
+    <input type="submit" value="Search"></p>
+    {% for category in categories|slice:':2:' %}
+    <input type="radio" name="cat" value="{{category.id}}"> {{category.name}} | 
+    {% endfor %}
+    </form>
+    {% elif length is 0 %}
+    <p>Sorry, no posts with your tag: {{tag.name}}, exists in this category at this time.</p>
+    <p>Try starting the conversation yourself!</p>
+    <p>Feel free to search again.</p>
+    <form action="/search" method="post">
+    {% csrf_token %}
+    <p><input type="text" name="query" placeholder="Search tags">
+    <input type="submit" value="Search"></p>
+    {% for category in categories|slice:':2:' %}
+    <input type="radio" name="cat" value="{{category.id}}"> {{category.name}} | 
+    {% endfor %}
+    </form>
+    {% else %}
+    {% for post in posts %}
+        
+      
+
+        
+    <div class="container border border-dark">
+        <h6><a href="/users/{{post.poster.id}}">{{post.poster.username}}</a>:</h6>
+        <p>{{post.post}}</p>
+        <p>Category: <span class="text-italic"><a href="/{{post.categories.values.0.name}}/results">{{post.categories.values.0.name}}</a></span> | Tag(s): {% for tag in post.tags.values %} <a href="/all/results/{{tag.name}}">{{tag.name}}</a>  {% endfor %}
+        </p>
+        {% if request.session.user == post.poster.id %}
+                    <form action="/delete" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="post" value="{{post.id}}">
+                        <input type="submit" class="btn-danger" value="Delete">                    
+                    </form>
+                    {% endif %}
+        {% if 'user' in request.session %}
+        <form action="{{profile.id}}/comment" method="post">
+            {% csrf_token %}
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "text" in message.tags %}
+                    <h6 class="text-danger">{{message}}</h6>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}   
+            <textarea name="text" cols="50" rows="2"></textarea>
+            <input type="hidden" name="source" value={{post.id}}>
+            <p><input type="submit" class="btn-secondary" value="Comment"></p>
+        </form>
+        {% else %}
+        <a href="/register">Register to join the conversation</a>
+        {% endif %}
+        {% for comment in post.comments.all %}
+        <ul>
+            <li><a href="/users/{{comment.commenters.id}}">{{comment.commenters.username}}</a> says: {{comment.comment}}
+            </li>
+            <li>{% if request.session.user == comment.commenters.id %}
+                    <form action="/delete" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="comment" value="{{comment.id}}">
+                        <input type="submit" class="btn-danger" value="Delete">                    
+                    </form>
+                    {% endif %}</li>
+        </ul>
+        {% endfor %}
+        
+    </div>
+    {% endfor %}
+
+
+
+
+
+
+    {% endif %}
+    </div>
+</body>
+</html>
