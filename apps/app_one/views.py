@@ -183,7 +183,11 @@ def follow(request,num):
     follower=User.objects.get(id=request.session['user'])
     Following.objects.create(followed=followed,follower=follower)
     return redirect('/users/'+num)
-
+def unfollow(request, num):
+    number = int(num)
+    target = Following.objects.filter(followed_id=number, follower_id=request.session['user'])
+    target.delete()
+    return redirect(request.META.get('HTTP_REFERER'))
 def local_post(request):
     errors=Post.objects.text_validator(request.POST)
     poster=User.objects.get(id=request.session['user'])

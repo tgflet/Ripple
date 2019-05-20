@@ -19,5 +19,6 @@ urlpatterns =[
     path('<cat>/results',views.cat_sort),
     path('search',views.search),
     path('delete',views.destroy),
+    path('users/<num>/unfollow', views.unfollow),
 
 ]
